@@ -24,10 +24,6 @@ provider:
               - dynamodb:DeleteItem
             Resource:
               - arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.WEBSOCKETS_TABLE}
-plugins:
-  - serverless-python-requirements
-  - serverless-offline
-  - serverless-dynamodb-local
 
 package:
   exclude:
