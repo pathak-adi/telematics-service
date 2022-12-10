@@ -1,0 +1,74 @@
+service: telematics-websocket
+
+custom:
+  WEBSOCKETS_TABLE: ${self:custom.stage}_websocket_active_connections
+
+provider:
+  name: aws
+  stage: ${opt:stage, self:provider.stage}
+  region: us-east-1
+  runtime: python3.9
+  environment:
+    WEBSOCKETS_TABLE: ${self:custom.WEBSOCKETS_TABLE}
+  iam:
+      role:
+        statements:
+          - Effect: Allow
+            Action:
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+            Resource:
+              - arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.WEBSOCKETS_TABLE}
+plugins:
+  - serverless-python-requirements
+  - serverless-offline
+  - serverless-dynamodb-local
+
+package:
+  exclude:
+    - node_modules/**
+    - .idea/**
+    - .requirements/**
+    - env/**
+    - README.md
+    - package.json
+    - package-lock.json
+    - requirements.txt
+
+functions:
+  connect:
+    handler: handler.connect
+    events:
+      - websocket:
+          route: $connect
+  disconnect:
+    handler: handler.disconnect
+    events:
+      - websocket:
+          route: $disconnect
+
+  send_message:
+    handler: handler.send_message
+    events:
+      - websocket:
+          route: sendMessage
+
+resources:
+  Resources:
+    ProcessDynamoDbTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "connection_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "connection_id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 2
+          WriteCapacityUnits: 2
+        TableName: ${self:custom.PROCESS_DYNAMODB_TABLE}
