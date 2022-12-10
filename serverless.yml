@@ -1,6 +1,7 @@
 service: telematics-websocket
 
 custom:
+  stage: ${opt:stage, self:provider.stage}
   WEBSOCKETS_TABLE: ${self:custom.stage}_websocket_active_connections
 
 provider:
@@ -59,7 +60,7 @@ functions:
 
 resources:
   Resources:
-    ProcessDynamoDbTable:
+    WebSocketDynamoDbTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
