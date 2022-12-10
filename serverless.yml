@@ -71,4 +71,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 2
           WriteCapacityUnits: 2
-        TableName: ${self:custom.PROCESS_DYNAMODB_TABLE}
+        TableName: ${self:custom.WEBSOCKETS_TABLE}
