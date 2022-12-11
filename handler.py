@@ -5,7 +5,7 @@ import boto3
 import botocore
 import sys
 
-sys.path.insert(0, F"{os.environ['LAMBDA_TASK_ROOT']}/{os.environ['DIR_NAME']}")
+# sys.path.insert(0, F"{os.environ['LAMBDA_TASK_ROOT']}/{os.environ['DIR_NAME']}")
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
