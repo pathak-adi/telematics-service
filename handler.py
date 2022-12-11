@@ -16,7 +16,7 @@ connections = dynamodb.Table(os.environ['WEBSOCKETS_TABLE'])
 def connect(event, context):
     logger.debug("onconnect: %s" % event)
 
-    connection_id = event.get('requestContext', {}).get('connectionId')
+    connection_id = event['requestContext']['connectionId']
     if connection_id is None:
         return {'statusCode': 400,
                 'body': 'bad request'}
@@ -32,7 +32,7 @@ def connect(event, context):
 def disconnect(event, context):
     logger.debug("ondisconnect: %s" % event)
 
-    connection_id = event.get('requestContext', {}).get('connectionId')
+    connection_id = event['requestContext']['connectionId']
     if connection_id is None:
         return {'statusCode': 400,
                 'body': 'bad request'}
@@ -46,10 +46,12 @@ def disconnect(event, context):
 
 def send_message(event, context):
     logger.debug("sendmessage: %s" % event)
-
-    post_data = json.loads(event.get('body', '{}')).get('data')
-    domain_name = event.get('requestContext', {}).get('domainName')
-    stage = event.get('requestContext', {}).get('stage')
+    try:
+        post_data = json.loads(event.get('body', '{}')).get('data')
+    except:
+        post_data=event['body']
+    domain_name = event['requestContext']['domainName']
+    stage = event['requestContext']['stage']
     if (post_data and domain_name and stage) is None:
         return {'statusCode': 400,
                 'body': 'bad request'}
