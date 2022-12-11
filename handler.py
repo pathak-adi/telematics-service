@@ -21,7 +21,7 @@ def connect(event, context):
         return {'statusCode': 400,
                 'body': 'bad request'}
 
-    result = connections.put_item(Item={'id': connection_id})
+    result = connections.put_item(Item={'connection_id': connection_id})
     if result.get('ResponseMetadata', {}).get('HTTPStatusCode') != 200:
         return {'statusCode': 500,
                 'body': 'something went wrong'}
@@ -37,7 +37,7 @@ def disconnect(event, context):
         return {'statusCode': 400,
                 'body': 'bad request'}
 
-    result = connections.delete_item(Key={'id': connection_id})
+    result = connections.delete_item(Key={'connection_id': connection_id})
     if result.get('ResponseMetadata', {}).get('HTTPStatusCode') != 200:
         logger.debug('delete_item failed: %s' % result)
     return {'statusCode': 200,
@@ -56,7 +56,7 @@ def send_message(event, context):
         return {'statusCode': 400,
                 'body': 'bad request'}
 
-    items = connections.scan(ProjectionExpression='id').get('Items')
+    items = connections.scan(ProjectionExpression='connection_id').get('Items')
     if items is None:
         return {'statusCode': 500,
                 'body': 'something went wrong'}
@@ -65,12 +65,12 @@ def send_message(event, context):
                                     endpoint_url=F"https://{domain_name}/{stage}")
     for item in items:
         try:
-            _ = apigw_management.post_to_connection(ConnectionId=item['id'],
+            _ = apigw_management.post_to_connection(ConnectionId=item['connection_id'],
                                                     Data=post_data)
         except botocore.exceptions.ClientError as e:
             if e.response.get('ResponseMetadata', {}).get('HTTPStatusCode') == 410:
-                connections.delete_item(Key={'id': item['id']})
-                logger.debug('post_to_connection skipped: %s removed from connections' % item['id'])
+                connections.delete_item(Key={'connection_id': item['connection_id']})
+                logger.debug('post_to_connection skipped: %s removed from connections' % item['connection_id'])
             else:
                 logger.debug('post_to_connection failed: %s' % e)
                 return {'statusCode': 500,
