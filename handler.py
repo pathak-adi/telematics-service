@@ -10,7 +10,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 dynamodb = boto3.resource('dynamodb')
-connections = dynamodb.Table(os.environ['TABLE_NAME'])
+connections = dynamodb.Table(os.environ['WEBSOCKETS_TABLE'])
 
 
 def connect(event, context):
