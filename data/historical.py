@@ -26,9 +26,9 @@ def query_by_time(event, context):
             event['pathParameters']['end']
                  )
     result = table.query(
-        KeyConditionExpression=Key('imei').eq(event['pathParameters']['imei']) & Key('datetime').between(
-            event['pathParameters']['start'],
-            event['pathParameters']['end']),
+        KeyConditionExpression=Key('imei').eq(str(event['pathParameters']['imei'])) & Key('datetime').between(
+            int(event['pathParameters']['start']),
+            int(event['pathParameters']['end'])),
     )
     if result['Items']:
 
