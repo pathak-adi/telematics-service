@@ -3,6 +3,24 @@ service: telematics-websocket
 custom:
   stage: ${opt:stage, self:provider.stage}
   WEBSOCKETS_TABLE: ${self:custom.stage}_websocket_active_connections
+  TELEMATICS_TABLE: ${self:custom.stage}_telematics_data
+  settings:
+    staging:
+      STAGE: ${self:custom.stage}
+    dev:
+      STAGE: ${self:custom.stage}
+    production:
+      STAGE: ${self:custom.stage}
+    apiGateway:
+      dev:
+        restApiId: z92bvmqd7b
+        restApiRootResourceId: 73ctukv5ob
+      staging:
+        restApiId: z92bvmqd7b
+        restApiRootResourceId: 73ctukv5ob
+      production:
+        restApiId: fd0rldztoh
+        restApiRootResourceId: 8744o51k3a
 
 provider:
   name: aws
@@ -11,6 +29,7 @@ provider:
   runtime: python3.9
   environment:
     WEBSOCKETS_TABLE: ${self:custom.WEBSOCKETS_TABLE}
+    TELEMATICS_TABLE: ${self:custom.TELEMATICS_TABLE}
   iam:
       role:
         statements:
@@ -24,6 +43,7 @@ provider:
               - dynamodb:DeleteItem
             Resource:
               - arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.WEBSOCKETS_TABLE}
+              - arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.TELEMATICS_TABLE}
 
 package:
   exclude:
@@ -54,6 +74,23 @@ functions:
       - websocket:
           route: sendMessage
 
+  receive:
+    handler: data/data.insert
+    events:
+      - http:
+          path: data/append
+          method: post
+          cors: true
+
+  query_data:
+    handler: data/historical.query_by_time
+    events:
+      - http:
+          path: data/v1/get/{imei}/{start}/{end}
+          method: get
+          cors: true
+
+
 resources:
   Resources:
     WebSocketDynamoDbTable:
@@ -69,3 +106,20 @@ resources:
           ReadCapacityUnits: 2
           WriteCapacityUnits: 2
         TableName: ${self:custom.WEBSOCKETS_TABLE}
+    TelematicsDynamoDbTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "datetime"
+            AttributeType: "N"
+          - AttributeName: "imei"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "datetime"
+            KeyType: "HASH"
+          - AttributeName: "imei"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 2
+        TableName: ${self:custom.TELEMATICS_TABLE}
