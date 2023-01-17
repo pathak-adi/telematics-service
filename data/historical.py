@@ -7,9 +7,10 @@ import json
 
 dynamodb = boto3.resource('dynamodb')
 
-
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
+
+
 # This is a workaround for: http://bugs.python.org/issue16535
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -22,9 +23,9 @@ def query_by_time(event, context):
     table_name = os.environ['TELEMATICS_TABLE']
     table = dynamodb.Table(table_name)
     logger.info(f'Event Body {event}')
-    logger.info(event['pathParameters']['start'],
-            event['pathParameters']['end']
-                 )
+    logger.info(event['pathParameters']['start'])
+    logger.info(event['pathParameters']['end'])
+    logger.info(event['pathParameters']['imei'])
     result = table.query(
         KeyConditionExpression=Key('imei').eq(str(event['pathParameters']['imei'])) & Key('datetime').between(
             int(event['pathParameters']['start']),
