@@ -12,8 +12,8 @@ def query_by_time(event, context):
     table = dynamodb.Table(table_name)
 
     result = table.query(
-        KeyConditionExpression=Key('datetime').between(event['pathParameters']['start'],
-                                                   event['pathParameters']['end']) & Key('imei').eq(event['pathParameters']['imei']),
+        KeyConditionExpression=Key('imei').eq(event['pathParameters']['imei']) & Key('datetime').between(event['pathParameters']['start'],
+                                                   event['pathParameters']['end']),
     )
     if result['Items']:
 

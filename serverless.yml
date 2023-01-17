@@ -116,9 +116,9 @@ resources:
             AttributeType: "S"
         KeySchema:
           - AttributeName: "datetime"
-            KeyType: "HASH"
-          - AttributeName: "imei"
             KeyType: "RANGE"
+          - AttributeName: "imei"
+            KeyType: "HASH"
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 2
