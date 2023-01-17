@@ -1,6 +1,5 @@
 import json
 import os
-import decimalencoder
 from boto3.dynamodb.conditions import Key, Attr
 import boto3
 
@@ -24,14 +23,12 @@ def query_by_time(event, context):
             "headers": {
                 "Access-Control-Allow-Origin": "*",
             },
-            "body": json.dumps(result['Items'],
-                               cls=decimalencoder.DecimalEncoder)
+            "body": json.dumps(result['Items'])
         }
     else:
         response = {
             "statusCode": 200,
-            "body": json.dumps('No result',
-                               cls=decimalencoder.DecimalEncoder),
+            "body": json.dumps('No result'),
             "headers": {
                 "Access-Control-Allow-Origin": "*",
             }
