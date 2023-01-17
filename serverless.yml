@@ -3,7 +3,7 @@ service: telematics-websocket
 custom:
   stage: ${opt:stage, self:provider.stage}
   WEBSOCKETS_TABLE: ${self:custom.stage}_websocket_active_connections
-  TELEMATICS_TABLE: ${self:custom.stage}_telematics_data
+  TELEMATICS_TABLE: ${self:custom.stage}_telematics
   settings:
     staging:
       STAGE: ${self:custom.stage}
