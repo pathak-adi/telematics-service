@@ -90,6 +90,14 @@ functions:
           method: get
           cors: true
 
+  query_data_by_device:
+    handler: data/historical.query_by_device
+    events:
+      - http:
+          path: data/v1/get/{imei}
+          method: get
+          cors: true
+
 
 resources:
   Resources:

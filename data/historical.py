@@ -51,3 +51,34 @@ def query_by_time(event, context):
         }
 
     return response
+
+
+def query_by_device(event, context):
+    table_name = os.environ['TELEMATICS_TABLE']
+    table = dynamodb.Table(table_name)
+    logger.info(f'Event Body {event}')
+    logger.info(event['pathParameters']['imei'])
+    result = table.query(
+        KeyConditionExpression=Key('imei').eq(str(event['pathParameters']['imei']))
+    )
+
+    if result['Items']:
+
+        # create a response
+        response = {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+            },
+            "body": json.dumps(result['Items'], cls=DecimalEncoder)
+        }
+    else:
+        response = {
+            "statusCode": 200,
+            "body": json.dumps('No result', cls=DecimalEncoder),
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+            }
+        }
+
+    return response
